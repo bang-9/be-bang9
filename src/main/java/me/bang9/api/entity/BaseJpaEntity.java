@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public abstract class BaseJpaEntity {
 
     @Column(nullable = false)
-    protected Boolean status = true;
+    protected Boolean status = Boolean.TRUE;
 
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -32,12 +32,12 @@ public abstract class BaseJpaEntity {
     protected boolean softDelete() {
         if (status == false)
             throw new Error("Already deleted");
-        this.status = false;
+        this.status = Boolean.FALSE;
         return true;
     }
 
     protected boolean restoreDeleted() {
-        this.status = true;
+        this.status = Boolean.TRUE;
         return true;
     }
 }
