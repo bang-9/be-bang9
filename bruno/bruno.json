@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "be-bang9",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
