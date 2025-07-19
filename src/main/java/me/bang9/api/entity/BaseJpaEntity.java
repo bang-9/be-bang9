@@ -2,8 +2,6 @@ package me.bang9.api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,19 +16,18 @@ import java.time.LocalDateTime;
 @Getter
 public abstract class BaseJpaEntity {
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     protected Boolean status = true;
 
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(nullable = false, updatable = false)
-    protected LocalDateTime createdAt;
+    protected LocalDateTime createdAt = LocalDateTime.now();
 
     @LastModifiedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(nullable = false)
-    protected LocalDateTime modifiedAt;
+    protected LocalDateTime modifiedAt = LocalDateTime.now();
 
     protected boolean softDelete() {
         if (status == false)
