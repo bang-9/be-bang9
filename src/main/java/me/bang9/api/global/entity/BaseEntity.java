@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-public abstract class BaseJpaEntity {
+public abstract class BaseEntity {
 
     @Column(nullable = false)
     protected Boolean status = Boolean.TRUE;
