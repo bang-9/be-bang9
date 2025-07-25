@@ -49,7 +49,7 @@ public class ApiResponse<T> {
     }
 
     // For failure responses
-    public static <T> ApiResponse<T> onFailure(String code, String message, HttpStatus httpStatus) {
+    public static ApiResponse<Void> onFailure(String code, String message, HttpStatus httpStatus) {
         return new ApiResponse<>(false, code, message, httpStatus);
     }
 

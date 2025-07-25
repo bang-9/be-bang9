@@ -11,6 +11,7 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -28,7 +29,10 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user", schema = "bang9")
+@Table(name = "user", schema = "bang9", indexes = {
+        @Index(name = "idx_user_email", columnList = "email"),
+        @Index(name = "idx_user_nickname", columnList = "nickname"),
+})
 @Getter
 @Setter
 public class UserEntity extends BaseEntity {

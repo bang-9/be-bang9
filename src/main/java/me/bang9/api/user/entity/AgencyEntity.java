@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -18,7 +19,9 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "agency", schema = "bang9")
+@Table(name = "agency", schema = "bang9", indexes = {
+        @Index(name = "idx_agency_name", columnList = "name"),
+})
 @Getter
 @Setter
 @RequiredArgsConstructor

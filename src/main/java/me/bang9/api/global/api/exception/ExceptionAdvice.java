@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Bang9Exception.class)
-    public ResponseEntity<ApiResponse<Object>> onThrowException(Bang9Exception bang9Exception, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Void>> onThrowException(Bang9Exception bang9Exception, HttpServletRequest request) {
 
         ErrorReasonDto e = bang9Exception.getErrorReasonHttpStatus();
 
