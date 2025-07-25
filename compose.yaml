@@ -1,7 +1,7 @@
 services:
-  postgres:
+  postgis:
     image: ${POSTGIS_IMAGE} # PostGIS arm64 - 배포 시 amd64 버전으로 변경
-    container_name: 'bang9-postgres'
+    container_name: 'bang9-postgis'
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -11,7 +11,7 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data  # DB 데이터 volume
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql # init sql 파일: db 초기 설정용
+      - ./postgis/init.sql:/docker-entrypoint-initdb.d/01-init.sql # init sql 파일: db 초기 설정용
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U bang9 -d bang9" ]
       interval: 10s
