@@ -11,8 +11,8 @@ Code Style and Structure
 Spring Boot Specifics
 
 - Use Spring Boot starters for quick project setup and dependency management.
-- Implement proper use of annotations (e.g., @SpringBootApplication, @RestController, @Service).
-- Utilize Spring Boot's auto-configuration features effectively.
+- Implement proper use of annotations (e.g., @SpringBootApplication, @RestController, @Service, @Repository).
+- Utilize Spring Boot's autoconfiguration features effectively.
 - Implement proper exception handling using @RestControllerAdvice and @ExceptionHandler.
 
 Naming Conventions
@@ -42,7 +42,8 @@ Dependency Injection and IoC
 
 Testing
 
-- Write unit tests using JUnit 5 and Spring Boot Test.
+- Implement Test-Driven Development (TDD) practices.
+- Write unit tests using test containers and JUnit 5.
 - Use MockMvc for testing web layers.
 - Implement integration tests using @SpringBootTest.
 - Use @DataJpaTest for repository layer tests.
