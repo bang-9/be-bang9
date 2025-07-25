@@ -1,4 +1,4 @@
-package me.bang9.api.controller;
+package me.bang9.api.global.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

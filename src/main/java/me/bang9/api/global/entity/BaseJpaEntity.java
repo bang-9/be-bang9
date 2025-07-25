@@ -1,4 +1,4 @@
-package me.bang9.api.entity;
+package me.bang9.api.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
