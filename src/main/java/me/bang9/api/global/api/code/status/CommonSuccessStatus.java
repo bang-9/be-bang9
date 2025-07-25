@@ -1,12 +1,14 @@
-package me.bang9.api.global.api.code;
+package me.bang9.api.global.api.code.status;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.bang9.api.global.api.code.BaseSuccessCode;
+import me.bang9.api.global.api.code.SuccessReasonDto;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum SuccessStatus implements BaseSuccessCode {
+public enum CommonSuccessStatus implements BaseSuccessCode {
 
     _OK(HttpStatus.OK, "COMMON-200", "Request was successful"),
     _CREATED(HttpStatus.CREATED, "COMMON-201", "Resource was created successfully");

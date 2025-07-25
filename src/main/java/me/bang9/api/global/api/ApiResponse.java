@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
-import me.bang9.api.global.api.code.SuccessStatus;
+import me.bang9.api.global.api.code.status.CommonSuccessStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -45,7 +45,7 @@ public class ApiResponse<T> {
 
     // For success responses without response body
     public static ApiResponse<Void> onSuccess() {
-        return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), HttpStatus.OK);
+        return new ApiResponse<>(true, CommonSuccessStatus._OK.getCode(), CommonSuccessStatus._OK.getMessage(), HttpStatus.OK);
     }
 
     // For failure responses
