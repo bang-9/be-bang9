@@ -10,40 +10,40 @@ import java.util.UUID;
 public interface UserAuthUseCase {
     
     /**
-     * Create a new user with EMAIL provider
-     * @param request UserCreateRequest containing email, password, nickname, and provider
-     * @return UserResponse of the created user
-     * @throws IllegalArgumentException if email already exists or validation fails
+     * EMAIL 제공자를 통한 새 사용자 생성
+     * @param request 이메일, 비밀번호, 닉네임, 제공자를 포함한 사용자 생성 요청
+     * @return 생성된 사용자의 응답 데이터
+     * @throws IllegalArgumentException 이메일이 이미 존재하거나 유효성 검사 실패 시
      */
     UserResponse createUser(UserCreateRequest request);
     
     /**
-     * Get all users in the system
-     * @return List of all users as UserResponse
+     * 시스템의 모든 사용자 조회
+     * @return 모든 사용자의 응답 데이터 목록
      */
     List<UserResponse> getAllUsers();
     
     /**
-     * Get a specific user by ID
-     * @param userId UUID of the user to retrieve
-     * @return UserResponse of the requested user
-     * @throws IllegalArgumentException if user not found
+     * ID로 특정 사용자 조회
+     * @param userId 조회할 사용자의 UUID
+     * @return 요청된 사용자의 응답 데이터
+     * @throws IllegalArgumentException 사용자를 찾을 수 없는 경우
      */
     UserResponse getUserById(UUID userId);
     
     /**
-     * Update user information (nickname only for now)
-     * @param userId UUID of the user to update
-     * @param request UserUpdateRequest containing new nickname
-     * @return UserResponse of the updated user
-     * @throws IllegalArgumentException if user not found or nickname validation fails
+     * 사용자 정보 수정 (현재는 닉네임만 지원)
+     * @param userId 수정할 사용자의 UUID
+     * @param request 새로운 닉네임을 포함한 수정 요청
+     * @return 수정된 사용자의 응답 데이터
+     * @throws IllegalArgumentException 사용자를 찾을 수 없거나 닉네임 유효성 검사 실패 시
      */
     UserResponse updateUser(UUID userId, UserUpdateRequest request);
     
     /**
-     * Soft delete a user by setting deleted flag
-     * @param userId UUID of the user to delete
-     * @throws IllegalArgumentException if user not found or already deleted
+     * 삭제 플래그를 설정하여 사용자 소프트 삭제
+     * @param userId 삭제할 사용자의 UUID
+     * @throws IllegalArgumentException 사용자를 찾을 수 없거나 이미 삭제된 경우
      */
     void softDeleteUser(UUID userId);
 }
