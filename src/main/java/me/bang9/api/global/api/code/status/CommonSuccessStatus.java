@@ -6,12 +6,15 @@ import me.bang9.api.global.api.code.BaseSuccessCode;
 import me.bang9.api.global.api.code.SuccessReasonDto;
 import org.springframework.http.HttpStatus;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+
 @Getter
 @AllArgsConstructor
 public enum CommonSuccessStatus implements BaseSuccessCode {
 
-    _OK(HttpStatus.OK, "COMMON-200", "Request was successful"),
-    _CREATED(HttpStatus.CREATED, "COMMON-201", "Resource was created successfully");
+    _OK(OK, "COMMON-200", "Request was successful"),
+    _CREATED(CREATED, "COMMON-201", "Resource was created successfully");
 
 
     private final HttpStatus httpStatus;
