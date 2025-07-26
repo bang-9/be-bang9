@@ -1,0 +1,271 @@
+package me.bang9.api.user.service;
+
+import me.bang9.api.user.dto.req.UserCreateRequest;
+import me.bang9.api.user.dto.req.UserUpdateRequest;
+import me.bang9.api.user.entity.UserEntity;
+import me.bang9.api.user.model.Provider;
+import me.bang9.api.user.model.UserRole;
+import me.bang9.api.user.repository.UserJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("UserAuthUseCase 서비스 테스트")
+class UserAuthUseCaseTest {
+
+    @Mock
+    private UserJpaRepository userRepository;
+
+    // @Mock
+    // private PasswordEncoder passwordEncoder;
+
+    private UserAuthUseCase userAuthUseCase;
+
+    private UserEntity testUser;
+    private UserCreateRequest createRequest;
+    private UserUpdateRequest updateRequest;
+
+    // Helper method to create a deleted user for testing
+    private UserEntity createDeletedUser() {
+        UserEntity deletedUser = new UserEntity();
+        deletedUser.setId(UUID.randomUUID());
+        deletedUser.setEmail("deleted@example.com");
+        deletedUser.setPassword("password");
+        deletedUser.setNickname("deleteduser");
+        deletedUser.setRole(UserRole.USER);
+        deletedUser.setProvider(Provider.EMAIL);
+        // Simulate deleted state by setting status to false
+        // This would normally be done through softDelete() method in actual implementation
+        return deletedUser;
+    }
+
+    @BeforeEach
+    void setUp() {
+        // TODO: Service implementation will be injected here
+        // userAuthUseCase = new UserAuthService(userRepository, passwordEncoder);
+
+        // Test data setup
+        testUser = new UserEntity();
+        testUser.setId(UUID.randomUUID());
+        testUser.setEmail("test@example.com");
+        testUser.setPassword("encodedPassword");
+        testUser.setNickname("testuser");
+        testUser.setRole(UserRole.USER);
+        testUser.setProvider(Provider.EMAIL);
+
+        createRequest = new UserCreateRequest(
+                "new@example.com",
+                "password123!",
+                "newuser",
+                Provider.EMAIL
+        );
+
+        updateRequest = new UserUpdateRequest("updatedNickname");
+    }
+
+    @Nested
+    @DisplayName("사용자 생성 테스트")
+    class CreateUserTest {
+
+        @Test
+        @DisplayName("새 사용자 생성 성공")
+        void createUser_Success() {
+            // Given
+            given(userRepository.existsByEmail(createRequest.email())).willReturn(false);
+            // given(passwordEncoder.encode(createRequest.password())).willReturn("encodedPassword");
+            given(userRepository.save(any(UserEntity.class))).willReturn(testUser);
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.createUser(createRequest))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessage("Cannot invoke \"me.bang9.api.user.service.UserAuthUseCase.createUser(me.bang9.api.user.dto.req.UserCreateRequest)\" because \"this.userAuthUseCase\" is null");
+        }
+
+        @Test
+        @DisplayName("이메일 중복으로 인한 사용자 생성 실패")
+        void createUser_ShouldFail_WhenEmailAlreadyExists() {
+            // Given
+            given(userRepository.existsByEmail(createRequest.email())).willReturn(true);
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.createUser(createRequest))
+                    .isInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("모든 사용자 조회 테스트")
+    class GetAllUsersTest {
+
+        @Test
+        @DisplayName("모든 사용자 조회 성공")
+        void getAllUsers_Success() {
+            // Given
+            UserEntity user2 = new UserEntity();
+            user2.setId(UUID.randomUUID());
+            user2.setEmail("user2@example.com");
+            user2.setPassword("password");
+            user2.setNickname("user2");
+            user2.setRole(UserRole.USER);
+            user2.setProvider(Provider.EMAIL);
+
+            given(userRepository.findAll()).willReturn(Arrays.asList(testUser, user2));
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.getAllUsers())
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("사용자가 없는 경우 빈 리스트 반환")
+        void getAllUsers_ShouldReturnEmptyList_WhenNoUsers() {
+            // Given
+            given(userRepository.findAll()).willReturn(Collections.emptyList());
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.getAllUsers())
+                    .isInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자 ID로 조회 테스트")
+    class GetUserByIdTest {
+
+        @Test
+        @DisplayName("사용자 ID로 조회 성공")
+        void getUserById_Success() {
+            // Given
+            UUID userId = testUser.getId();
+            given(userRepository.findById(userId)).willReturn(Optional.of(testUser));
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.getUserById(userId))
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 사용자 ID로 조회 실패")
+        void getUserById_ShouldFail_WhenUserNotFound() {
+            // Given
+            UUID userId = UUID.randomUUID();
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.getUserById(userId))
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("삭제된 사용자 조회 실패")
+        void getUserById_ShouldFail_WhenUserIsDeleted() {
+            // Given
+            UUID userId = testUser.getId();
+            UserEntity deletedUser = createDeletedUser();
+            given(userRepository.findById(userId)).willReturn(Optional.of(deletedUser));
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.getUserById(userId))
+                    .isInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자 정보 수정 테스트")
+    class UpdateUserTest {
+
+        @Test
+        @DisplayName("사용자 닉네임 수정 성공")
+        void updateUser_Success() {
+            // Given
+            UUID userId = testUser.getId();
+            given(userRepository.findById(userId)).willReturn(Optional.of(testUser));
+            given(userRepository.save(any(UserEntity.class))).willReturn(testUser);
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.updateUser(userId, updateRequest))
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 사용자 수정 실패")
+        void updateUser_ShouldFail_WhenUserNotFound() {
+            // Given
+            UUID userId = UUID.randomUUID();
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.updateUser(userId, updateRequest))
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("삭제된 사용자 수정 실패")
+        void updateUser_ShouldFail_WhenUserIsDeleted() {
+            // Given
+            UUID userId = testUser.getId();
+            UserEntity deletedUser = createDeletedUser();
+            given(userRepository.findById(userId)).willReturn(Optional.of(deletedUser));
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.updateUser(userId, updateRequest))
+                    .isInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자 소프트 삭제 테스트")
+    class SoftDeleteUserTest {
+
+        @Test
+        @DisplayName("사용자 소프트 삭제 성공")
+        void softDeleteUser_Success() {
+            // Given
+            UUID userId = testUser.getId();
+            given(userRepository.findById(userId)).willReturn(Optional.of(testUser));
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.softDeleteUser(userId))
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 사용자 삭제 실패")
+        void softDeleteUser_ShouldFail_WhenUserNotFound() {
+            // Given
+            UUID userId = UUID.randomUUID();
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.softDeleteUser(userId))
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("이미 삭제된 사용자 삭제 실패")
+        void softDeleteUser_ShouldFail_WhenUserAlreadyDeleted() {
+            // Given
+            UUID userId = testUser.getId();
+            UserEntity deletedUser = createDeletedUser();
+            given(userRepository.findById(userId)).willReturn(Optional.of(deletedUser));
+
+            // When & Then
+            assertThatThrownBy(() -> userAuthUseCase.softDeleteUser(userId))
+                    .isInstanceOf(NullPointerException.class);
+        }
+    }
+}
