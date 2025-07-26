@@ -1,7 +1,9 @@
 package me.bang9.api.user.service;
 
+import me.bang9.api.global.api.exception.Bang9Exception;
 import me.bang9.api.user.dto.req.UserCreateRequest;
 import me.bang9.api.user.dto.req.UserUpdateRequest;
+import me.bang9.api.user.dto.res.UserResponse;
 import me.bang9.api.user.entity.UserEntity;
 import me.bang9.api.user.model.Provider;
 import me.bang9.api.user.model.UserRole;
@@ -13,13 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static me.bang9.api.global.api.code.status.UserErrorStatus.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -30,8 +34,8 @@ class UserAuthUseCaseTest {
     @Mock
     private UserJpaRepository userRepository;
 
-    // @Mock
-    // private PasswordEncoder passwordEncoder;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     private UserAuthUseCase userAuthUseCase;
 
@@ -48,15 +52,24 @@ class UserAuthUseCaseTest {
         deletedUser.setNickname("deleteduser");
         deletedUser.setRole(UserRole.USER);
         deletedUser.setProvider(Provider.EMAIL);
-        // Simulate deleted state by setting status to false
-        // This would normally be done through softDelete() method in actual implementation
         return deletedUser;
+    }
+    
+    // Helper method to simulate deleted state using reflection
+    private void markAsDeleted(UserEntity entity) {
+        try {
+            var statusField = entity.getClass().getSuperclass().getDeclaredField("status");
+            statusField.setAccessible(true);
+            statusField.set(entity, Boolean.FALSE);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to mark entity as deleted", e);
+        }
     }
 
     @BeforeEach
     void setUp() {
-        // TODO: Service implementation will be injected here
-        // userAuthUseCase = new UserAuthService(userRepository, passwordEncoder);
+        // Inject the actual service implementation with mocked dependencies
+        userAuthUseCase = new UserAuthService(userRepository, passwordEncoder);
 
         // Test data setup
         testUser = new UserEntity();
@@ -86,13 +99,16 @@ class UserAuthUseCaseTest {
         void createUser_Success() {
             // Given
             given(userRepository.existsByEmail(createRequest.email())).willReturn(false);
-            // given(passwordEncoder.encode(createRequest.password())).willReturn("encodedPassword");
+            given(passwordEncoder.encode(createRequest.password())).willReturn("encodedPassword");
             given(userRepository.save(any(UserEntity.class))).willReturn(testUser);
 
-            // When & Then
-            assertThatThrownBy(() -> userAuthUseCase.createUser(createRequest))
-                    .isInstanceOf(NullPointerException.class)
-                    .hasMessage("Cannot invoke \"me.bang9.api.user.service.UserAuthUseCase.createUser(me.bang9.api.user.dto.req.UserCreateRequest)\" because \"this.userAuthUseCase\" is null");
+            // When
+            UserResponse result = userAuthUseCase.createUser(createRequest);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.email()).isEqualTo(testUser.getEmail());
+            assertThat(result.nickname()).isEqualTo(testUser.getNickname());
         }
 
         @Test
@@ -103,7 +119,7 @@ class UserAuthUseCaseTest {
 
             // When & Then
             assertThatThrownBy(() -> userAuthUseCase.createUser(createRequest))
-                    .isInstanceOf(NullPointerException.class);
+                    .isInstanceOf(Bang9Exception.class);
         }
     }
 
@@ -125,9 +141,13 @@ class UserAuthUseCaseTest {
 
             given(userRepository.findAll()).willReturn(Arrays.asList(testUser, user2));
 
-            // When & Then
-            assertThatThrownBy(() -> userAuthUseCase.getAllUsers())
-                    .isInstanceOf(NullPointerException.class);
+            // When
+            var result = userAuthUseCase.getAllUsers();
+
+            // Then
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0).email()).isEqualTo(testUser.getEmail());
+            assertThat(result.get(1).email()).isEqualTo(user2.getEmail());
         }
 
         @Test
@@ -136,9 +156,11 @@ class UserAuthUseCaseTest {
             // Given
             given(userRepository.findAll()).willReturn(Collections.emptyList());
 
-            // When & Then
-            assertThatThrownBy(() -> userAuthUseCase.getAllUsers())
-                    .isInstanceOf(NullPointerException.class);
+            // When
+            var result = userAuthUseCase.getAllUsers();
+
+            // Then
+            assertThat(result).isEmpty();
         }
     }
 
@@ -153,9 +175,13 @@ class UserAuthUseCaseTest {
             UUID userId = testUser.getId();
             given(userRepository.findById(userId)).willReturn(Optional.of(testUser));
 
-            // When & Then
-            assertThatThrownBy(() -> userAuthUseCase.getUserById(userId))
-                    .isInstanceOf(NullPointerException.class);
+            // When
+            UserResponse result = userAuthUseCase.getUserById(userId);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.email()).isEqualTo(testUser.getEmail());
+            assertThat(result.nickname()).isEqualTo(testUser.getNickname());
         }
 
         @Test
@@ -167,7 +193,7 @@ class UserAuthUseCaseTest {
 
             // When & Then
             assertThatThrownBy(() -> userAuthUseCase.getUserById(userId))
-                    .isInstanceOf(NullPointerException.class);
+                    .isInstanceOf(Bang9Exception.class);
         }
 
         @Test
@@ -176,11 +202,12 @@ class UserAuthUseCaseTest {
             // Given
             UUID userId = testUser.getId();
             UserEntity deletedUser = createDeletedUser();
+            markAsDeleted(deletedUser); // Actually mark as deleted
             given(userRepository.findById(userId)).willReturn(Optional.of(deletedUser));
 
             // When & Then
             assertThatThrownBy(() -> userAuthUseCase.getUserById(userId))
-                    .isInstanceOf(NullPointerException.class);
+                    .isInstanceOf(Bang9Exception.class);
         }
     }
 
@@ -196,9 +223,12 @@ class UserAuthUseCaseTest {
             given(userRepository.findById(userId)).willReturn(Optional.of(testUser));
             given(userRepository.save(any(UserEntity.class))).willReturn(testUser);
 
-            // When & Then
-            assertThatThrownBy(() -> userAuthUseCase.updateUser(userId, updateRequest))
-                    .isInstanceOf(NullPointerException.class);
+            // When
+            UserResponse result = userAuthUseCase.updateUser(userId, updateRequest);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.nickname()).isEqualTo(updateRequest.nickname());
         }
 
         @Test
@@ -210,7 +240,7 @@ class UserAuthUseCaseTest {
 
             // When & Then
             assertThatThrownBy(() -> userAuthUseCase.updateUser(userId, updateRequest))
-                    .isInstanceOf(NullPointerException.class);
+                    .isInstanceOf(Bang9Exception.class);
         }
 
         @Test
@@ -219,11 +249,12 @@ class UserAuthUseCaseTest {
             // Given
             UUID userId = testUser.getId();
             UserEntity deletedUser = createDeletedUser();
+            markAsDeleted(deletedUser); // Actually mark as deleted
             given(userRepository.findById(userId)).willReturn(Optional.of(deletedUser));
 
             // When & Then
             assertThatThrownBy(() -> userAuthUseCase.updateUser(userId, updateRequest))
-                    .isInstanceOf(NullPointerException.class);
+                    .isInstanceOf(Bang9Exception.class);
         }
     }
 
@@ -239,8 +270,8 @@ class UserAuthUseCaseTest {
             given(userRepository.findById(userId)).willReturn(Optional.of(testUser));
 
             // When & Then
-            assertThatThrownBy(() -> userAuthUseCase.softDeleteUser(userId))
-                    .isInstanceOf(NullPointerException.class);
+            assertThatCode(() -> userAuthUseCase.softDeleteUser(userId))
+                    .doesNotThrowAnyException();
         }
 
         @Test
@@ -252,7 +283,7 @@ class UserAuthUseCaseTest {
 
             // When & Then
             assertThatThrownBy(() -> userAuthUseCase.softDeleteUser(userId))
-                    .isInstanceOf(NullPointerException.class);
+                    .isInstanceOf(Bang9Exception.class);
         }
 
         @Test
@@ -261,11 +292,12 @@ class UserAuthUseCaseTest {
             // Given
             UUID userId = testUser.getId();
             UserEntity deletedUser = createDeletedUser();
+            markAsDeleted(deletedUser); // Actually mark as deleted first
             given(userRepository.findById(userId)).willReturn(Optional.of(deletedUser));
 
             // When & Then
             assertThatThrownBy(() -> userAuthUseCase.softDeleteUser(userId))
-                    .isInstanceOf(NullPointerException.class);
+                    .isInstanceOf(Bang9Exception.class);
         }
     }
 }
