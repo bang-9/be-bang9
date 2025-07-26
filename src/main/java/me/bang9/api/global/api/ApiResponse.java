@@ -43,6 +43,11 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, code, message, result, HttpStatus.OK);
     }
 
+    // For success responses with response body and custom status
+    public static <T> ApiResponse<T> onSuccess(String code, String message, T result, HttpStatus httpStatus) {
+        return new ApiResponse<>(true, code, message, result, httpStatus);
+    }
+
     // For success responses without response body
     public static ApiResponse<Void> onSuccess() {
         return new ApiResponse<>(true, CommonSuccessStatus._OK.getCode(), CommonSuccessStatus._OK.getMessage(), HttpStatus.OK);

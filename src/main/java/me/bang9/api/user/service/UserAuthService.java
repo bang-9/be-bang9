@@ -131,7 +131,7 @@ public class UserAuthService implements UserAuthUseCase {
         try {
             // UserEntity의 performSoftDelete() 메서드 호출
             // 이미 삭제된 경우 Error를 던짐
-            user.performSoftDelete();
+            user.softDelete();
             userRepository.save(user);
             log.info("User soft deleted successfully: {}", userId);
         } catch (Error e) {

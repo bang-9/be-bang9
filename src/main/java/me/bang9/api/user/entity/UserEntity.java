@@ -76,12 +76,4 @@ public class UserEntity extends BaseEntity {
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private AgencyEntity representingAgency;
 
-    /**
-     * 사용자를 소프트 삭제합니다.
-     * @throws Error 이미 삭제된 사용자인 경우
-     */
-    public void performSoftDelete() {
-        this.softDelete();
-    }
-
 }
