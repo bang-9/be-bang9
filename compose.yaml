@@ -18,11 +18,13 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - bang9-network
 
 volumes:
   postgres_data:
     driver: local
 
 networks:
-  default:
+  bang9-network:
     name: bang9-network
