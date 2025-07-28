@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.bang9.api.global.api.ApiResponse;
+import me.bang9.api.global.api.Bang9Response;
 import me.bang9.api.user.dto.req.UserCreateRequest;
 import me.bang9.api.user.dto.req.UserUpdateRequest;
 import me.bang9.api.user.dto.res.UserResponse;
@@ -38,12 +38,12 @@ public class UserController implements UserApiDocs {
 
     @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserCreateRequest request) {
+    public ResponseEntity<Bang9Response<UserResponse>> createUser(@Valid @RequestBody UserCreateRequest request) {
         log.debug("Creating new user with email: {}", request.email());
 
         UserResponse response = userAuthUseCase.createUser(request);
 
-        return ApiResponse.onSuccess(
+        return Bang9Response.onSuccess(
                 _CREATED.getCode(),
                 _CREATED.getMessage(),
                 response,
@@ -53,12 +53,12 @@ public class UserController implements UserApiDocs {
 
     @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+    public ResponseEntity<Bang9Response<List<UserResponse>>> getAllUsers() {
         log.debug("Fetching all users");
 
         List<UserResponse> users = userAuthUseCase.getAllUsers();
 
-        return ApiResponse.onSuccess(
+        return Bang9Response.onSuccess(
                 _OK.getCode(),
                 _OK.getMessage(),
                 users
@@ -67,12 +67,12 @@ public class UserController implements UserApiDocs {
 
     @GetMapping("/{userId}")
     @Override
-    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable UUID userId) {
+    public ResponseEntity<Bang9Response<UserResponse>> getUserById(@PathVariable UUID userId) {
         log.debug("Fetching user by ID: {}", userId);
 
         UserResponse response = userAuthUseCase.getUserById(userId);
 
-        return ApiResponse.onSuccess(
+        return Bang9Response.onSuccess(
                 _OK.getCode(),
                 _OK.getMessage(),
                 response
@@ -81,7 +81,7 @@ public class UserController implements UserApiDocs {
 
     @PatchMapping("/{userId}")
     @Override
-    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+    public ResponseEntity<Bang9Response<UserResponse>> updateUser(
             @Parameter(description = "User unique identifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID userId,
             @Valid @RequestBody UserUpdateRequest request) {
@@ -89,7 +89,7 @@ public class UserController implements UserApiDocs {
 
         UserResponse response = userAuthUseCase.updateUser(userId, request);
 
-        return ApiResponse.onSuccess(
+        return Bang9Response.onSuccess(
                 _OK.getCode(),
                 _OK.getMessage(),
                 response
@@ -98,13 +98,13 @@ public class UserController implements UserApiDocs {
 
     @DeleteMapping("/{userId}")
     @Override
-    public ResponseEntity<ApiResponse<Void>> softDeleteUser(
+    public ResponseEntity<Bang9Response<Void>> softDeleteUser(
             @Parameter(description = "User unique identifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID userId) {
         log.debug("Soft deleting user with ID: {}", userId);
 
         userAuthUseCase.softDeleteUser(userId);
 
-        return ApiResponse.onSuccess().toResponseEntity();
+        return Bang9Response.onSuccess().toResponseEntity();
     }
 }

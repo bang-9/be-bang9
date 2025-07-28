@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import me.bang9.api.global.api.ApiResponse;
+import me.bang9.api.global.api.Bang9Response;
 import me.bang9.api.user.dto.req.UserCreateRequest;
 import me.bang9.api.user.dto.req.UserUpdateRequest;
 import me.bang9.api.user.dto.res.UserResponse;
@@ -52,7 +52,7 @@ public interface UserApiDocs {
                     description = "User created successfully",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                            schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -66,7 +66,7 @@ public interface UserApiDocs {
                     content = @Content(mediaType = "application/json")
             )
     })
-    ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserCreateRequest request);
+    ResponseEntity<Bang9Response<UserResponse>> createUser(@Valid @RequestBody UserCreateRequest request);
 
     @Operation(
             summary = "Get all users",
@@ -78,11 +78,11 @@ public interface UserApiDocs {
                     description = "Users retrieved successfully",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                            schema = @Schema(implementation = Bang9Response.class)
                     )
             )
     })
-    ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers();
+    ResponseEntity<Bang9Response<List<UserResponse>>> getAllUsers();
 
     @Operation(
             summary = "Get user by ID",
@@ -94,7 +94,7 @@ public interface UserApiDocs {
                     description = "User retrieved successfully",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                            schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -104,7 +104,7 @@ public interface UserApiDocs {
             )
     })
     @GetMapping("/{userId}")
-    ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable UUID userId);
+    ResponseEntity<Bang9Response<UserResponse>> getUserById(@PathVariable UUID userId);
 
     @Operation(
             summary = "Update user",
@@ -134,7 +134,7 @@ public interface UserApiDocs {
                     description = "User updated successfully",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                            schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -154,7 +154,7 @@ public interface UserApiDocs {
             )
     })
     @PatchMapping("/{userId}")
-    ResponseEntity<ApiResponse<UserResponse>> updateUser(
+    ResponseEntity<Bang9Response<UserResponse>> updateUser(
             @Parameter(description = "User unique identifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID userId,
             @Valid @RequestBody UserUpdateRequest request);
@@ -169,7 +169,7 @@ public interface UserApiDocs {
                     description = "User soft deleted successfully",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                            schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -184,7 +184,7 @@ public interface UserApiDocs {
             )
     })
     @DeleteMapping("/{userId}")
-    ResponseEntity<ApiResponse<Void>> softDeleteUser(
+    ResponseEntity<Bang9Response<Void>> softDeleteUser(
             @Parameter(description = "User unique identifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID userId);
 }

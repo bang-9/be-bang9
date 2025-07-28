@@ -2,7 +2,7 @@ package me.bang9.api.global.api.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import me.bang9.api.global.api.ApiResponse;
+import me.bang9.api.global.api.Bang9Response;
 import me.bang9.api.global.api.code.ErrorReasonDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -23,13 +23,13 @@ import static me.bang9.api.global.api.code.status.CommonErrorStatus.VALIDATION_E
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Bang9Exception.class)
-    public ResponseEntity<ApiResponse<Void>> onThrowException(Bang9Exception bang9Exception, HttpServletRequest request) {
+    public ResponseEntity<Bang9Response<Void>> onThrowException(Bang9Exception bang9Exception, HttpServletRequest request) {
 
         ErrorReasonDto e = bang9Exception.getErrorReasonHttpStatus();
 
         log.error("Bang9Exception[{}] occurred: {}", e.getCode(), e.getMessage());
 
-        return ApiResponse.onFailure(e.getCode(), e.getMessage(), e.getHttpStatus()).toResponseEntity();
+        return Bang9Response.onFailure(e.getCode(), e.getMessage(), e.getHttpStatus()).toResponseEntity();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
         log.warn("Validation failed: {}", errorMessage);
 
-        ResponseEntity<ApiResponse<Void>> apiResponse = ApiResponse.onFailure(VALIDATION_ERROR.getCode(), errorMessage, VALIDATION_ERROR.getHttpStatus()).toResponseEntity();
+        ResponseEntity<Bang9Response<Void>> apiResponse = Bang9Response.onFailure(VALIDATION_ERROR.getCode(), errorMessage, VALIDATION_ERROR.getHttpStatus()).toResponseEntity();
         return ResponseEntity.status(apiResponse.getStatusCode())
                 .headers(headers)
                 .body(apiResponse.getBody());
