@@ -82,7 +82,6 @@ public class UserController implements UserApiDocs {
     @PatchMapping("/{userId}")
     @Override
     public ResponseEntity<Bang9Response<UserResponse>> updateUser(
-            @Parameter(description = "User unique identifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID userId,
             @Valid @RequestBody UserUpdateRequest request) {
         log.debug("Updating user with ID: {}", userId);

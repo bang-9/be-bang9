@@ -5,28 +5,24 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import me.bang9.api.global.api.Bang9Response;
 import me.bang9.api.user.dto.req.UserCreateRequest;
 import me.bang9.api.user.dto.req.UserUpdateRequest;
 import me.bang9.api.user.dto.res.UserResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UserApiDocs {
     @Operation(
-            summary = "Create a new user",
-            description = "Creates a new user account with the provided information",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "User creation request",
+            summary = "이메일로 유저 생성",
+            description = "이메일 정보로 회원가입 성공 후 유저 정보 생성합니다.",
+            requestBody = @RequestBody(
+                    description = "생성 정보",
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
@@ -37,9 +33,9 @@ public interface UserApiDocs {
                                     value = """
                                             {
                                               "email": "user@example.com",
-                                              "password": "password123",
-                                              "nickname": "johndoe",
-                                              "name": "John Doe"
+                                              "password": "password123!",
+                                              "nickname": "Poby",
+                                              "name": "Sangmin Kim"
                                             }
                                             """
                             )
@@ -47,35 +43,35 @@ public interface UserApiDocs {
             )
     )
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "201",
-                    description = "User created successfully",
+                    description = "유저 생성 성공",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid input data",
+                    description = "입력 정보가 유효하지 않음",
                     content = @Content(mediaType = "application/json")
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "409",
                     description = "Email already exists",
                     content = @Content(mediaType = "application/json")
             )
     })
-    ResponseEntity<Bang9Response<UserResponse>> createUser(@Valid @RequestBody UserCreateRequest request);
+    ResponseEntity<Bang9Response<UserResponse>> createUser(UserCreateRequest request);
 
     @Operation(
-            summary = "Get all users",
-            description = "Retrieves a list of all active users in the system"
+            summary = "모든 유저 정보 조회",
+            description = "모든 유저 정보를 조회합니다."
     )
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200",
-                    description = "Users retrieved successfully",
+                    description = "유저 정보 목록 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Bang9Response.class)
@@ -85,32 +81,35 @@ public interface UserApiDocs {
     ResponseEntity<Bang9Response<List<UserResponse>>> getAllUsers();
 
     @Operation(
-            summary = "Get user by ID",
-            description = "Retrieves a specific user by their unique identifier"
+            summary = "유저 정보 조회",
+            description = "유저의 고유 식별자(UUID)를 사용하여 유저 정보를 조회합니다."
     )
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200",
-                    description = "User retrieved successfully",
+                    description = "유저 정보 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "404",
-                    description = "User not found",
+                    description = "유저를 찾을 수 없음",
                     content = @Content(mediaType = "application/json")
             )
     })
-    @GetMapping("/{userId}")
-    ResponseEntity<Bang9Response<UserResponse>> getUserById(@PathVariable UUID userId);
+    ResponseEntity<Bang9Response<UserResponse>> getUserById(
+            @Parameter(
+                    description = "유저id (UUID)",
+                    required = true, example = "123e4567-e89b-12d3-a456-426614174000"
+            ) UUID userId);
 
     @Operation(
-            summary = "Update user",
-            description = "Updates user information by their unique identifier",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "User update request",
+            summary = "유저 정보 수정",
+            description = "유저id에 해당하는 유저의 정보를 수정합니다.",
+            requestBody = @RequestBody(
+                    description = "수정된 유저 정보",
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
@@ -129,62 +128,65 @@ public interface UserApiDocs {
             )
     )
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200",
-                    description = "User updated successfully",
+                    description = "유저 정보 수정 성공",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid input data",
+                    description = "입력 정보가 유효하지 않음",
                     content = @Content(mediaType = "application/json")
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "404",
-                    description = "User not found",
+                    description = "유저를 찾을 수 없음",
                     content = @Content(mediaType = "application/json")
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "409",
-                    description = "Nickname already exists",
+                    description = "닉네임이 이미 존재함",
                     content = @Content(mediaType = "application/json")
             )
     })
-    @PatchMapping("/{userId}")
     ResponseEntity<Bang9Response<UserResponse>> updateUser(
-            @Parameter(description = "User unique identifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-            @PathVariable UUID userId,
-            @Valid @RequestBody UserUpdateRequest request);
+            @Parameter(
+                    description = "유저id (UUID)",
+                    required = true, example = "123e4567-e89b-12d3-a456-426614174000"
+            ) UUID userId,
+            UserUpdateRequest request);
 
     @Operation(
-            summary = "Soft delete user",
-            description = "Soft deletes a user by marking them as inactive instead of permanently removing them"
+            summary = "유저 삭제 (Soft Delete)",
+            description = "유저를 삭제합니다. 이 작업은 유저를 완전히 삭제하지 않고, status값을 false로 변경합니다."
     )
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200",
-                    description = "User soft deleted successfully",
+                    description = "유저 삭제 성공 (Soft Delete)",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Bang9Response.class)
                     )
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "400",
-                    description = "User already deleted",
+                    description = "이미 삭제된 유저입니다.",
                     content = @Content(mediaType = "application/json")
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "404",
-                    description = "User not found",
+                    description = "유저를 찾을 수 없음",
                     content = @Content(mediaType = "application/json")
             )
     })
-    @DeleteMapping("/{userId}")
     ResponseEntity<Bang9Response<Void>> softDeleteUser(
-            @Parameter(description = "User unique identifier", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-            @PathVariable UUID userId);
+            @Parameter(
+                    description = "유저id (UUID)",
+                    required = true,
+                    example = "123e4567-e89b-12d3-a456-426614174000"
+            ) UUID userId);
 }
