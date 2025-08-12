@@ -15,6 +15,27 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
   flyway:
     enabled: true
     baseline-on-migrate: true
+
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+    enabled: true
+  swagger-ui:
+    path: /api/v1/docs/swagger
+    enabled: true
+    try-it-out-enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    disable-swagger-default-url: true
+  show-actuator: true
+  cache:
+    disabled: true

@@ -1,9 +1,11 @@
-package me.bang9.api.entity;
+package me.bang9.api.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
+import me.bang9.api.global.api.code.status.CommonErrorStatus;
+import me.bang9.api.global.api.exception.Bang9Exception;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-public abstract class BaseJpaEntity {
+public abstract class BaseEntity {
 
     @Column(nullable = false)
     protected Boolean status = Boolean.TRUE;
@@ -29,15 +31,13 @@ public abstract class BaseJpaEntity {
     @Column(nullable = false)
     protected LocalDateTime modifiedAt = LocalDateTime.now();
 
-    protected boolean softDelete() {
+    public void softDelete() {
         if (status == false)
-            throw new Error("Already deleted");
+            throw new Bang9Exception(CommonErrorStatus._BAD_REQUEST);
         this.status = Boolean.FALSE;
-        return true;
     }
 
-    protected boolean restoreDeleted() {
+    public void restoreDeleted() {
         this.status = Boolean.TRUE;
-        return true;
     }
 }
