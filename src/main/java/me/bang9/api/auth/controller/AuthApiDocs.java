@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import me.bang9.api.auth.dto.AuthResponse;
 import me.bang9.api.auth.dto.LoginRequest;
-import me.bang9.api.auth.dto.LogoutRequest;
 import me.bang9.api.auth.dto.RefreshTokenRequest;
 import me.bang9.api.global.api.Bang9Response;
 import me.bang9.api.user.dto.req.UserCreateRequest;
@@ -64,6 +63,6 @@ public interface AuthApiDocs {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
     })
-    ResponseEntity<Bang9Response<Void>> logout(@Valid @RequestBody LogoutRequest request);
+    ResponseEntity<Bang9Response<Void>> logout();
 
 }

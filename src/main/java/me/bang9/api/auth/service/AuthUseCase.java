@@ -2,7 +2,6 @@ package me.bang9.api.auth.service;
 
 import me.bang9.api.auth.dto.AuthResponse;
 import me.bang9.api.auth.dto.LoginRequest;
-import me.bang9.api.auth.dto.LogoutRequest;
 import me.bang9.api.auth.dto.RefreshTokenRequest;
 import me.bang9.api.user.dto.req.UserCreateRequest;
 import me.bang9.api.user.dto.res.UserResponse;
@@ -51,6 +50,6 @@ public interface AuthUseCase {
      *
      * @param request 로그아웃 요청 (액세스 토큰)
      */
-    void logout(LogoutRequest request);
+    void logout();
 
 }

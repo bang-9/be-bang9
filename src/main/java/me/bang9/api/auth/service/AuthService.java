@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.bang9.api.auth.dto.AuthResponse;
 import me.bang9.api.auth.dto.LoginRequest;
-import me.bang9.api.auth.dto.LogoutRequest;
 import me.bang9.api.auth.dto.RefreshTokenRequest;
 import me.bang9.api.auth.dto.UserInfoResponse;
 import me.bang9.api.global.api.exception.Bang9Exception;
@@ -186,7 +185,7 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
-    public void logout(LogoutRequest request) {
+    public void logout() {
         log.debug("Logout request");
 
         try {

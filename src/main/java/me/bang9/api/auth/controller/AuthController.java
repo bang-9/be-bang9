@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.bang9.api.auth.dto.AuthResponse;
 import me.bang9.api.auth.dto.LoginRequest;
-import me.bang9.api.auth.dto.LogoutRequest;
 import me.bang9.api.auth.dto.RefreshTokenRequest;
 import me.bang9.api.auth.service.AuthUseCase;
 import me.bang9.api.global.api.Bang9Response;
@@ -67,10 +66,10 @@ public class AuthController implements AuthApiDocs {
 
     @Override
     @PostMapping("/logout")
-    public ResponseEntity<Bang9Response<Void>> logout(@Valid @RequestBody LogoutRequest request) {
+    public ResponseEntity<Bang9Response<Void>> logout() {
         log.debug("Logout request");
 
-        authUseCase.logout(request);
+        authUseCase.logout();
 
         return Bang9Response.onSuccess().toResponseEntity();
     }
