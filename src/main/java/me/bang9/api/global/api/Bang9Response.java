@@ -38,20 +38,26 @@ public class Bang9Response<T> {
         this.httpStatus = httpStatus;
     }
 
-    // For success responses with response body
-    public static <T> Bang9Response<T> onSuccess(String code, String message, T result) {
-        return new Bang9Response<>(true, code, message, result, HttpStatus.OK);
+    // For success responses without response body
+    public static Bang9Response<Void> onSuccess() {
+        return onSuccess(null);
     }
 
-    // For success responses with response body and custom status
+    // For success responses with response body
+    public static <T> Bang9Response<T> onSuccess(T result) {
+        return onSuccess(CommonSuccessStatus._OK.getCode(), CommonSuccessStatus._OK.getMessage(), result);
+    }
+
+    // For success responses with custom code, message, body
+    public static <T> Bang9Response<T> onSuccess(String code, String message, T result) {
+        return onSuccess(code, message, result, HttpStatus.OK);
+    }
+
+    // For success responses with custom code, message, body, status
     public static <T> Bang9Response<T> onSuccess(String code, String message, T result, HttpStatus httpStatus) {
         return new Bang9Response<>(true, code, message, result, httpStatus);
     }
 
-    // For success responses without response body
-    public static Bang9Response<Void> onSuccess() {
-        return new Bang9Response<>(true, CommonSuccessStatus._OK.getCode(), CommonSuccessStatus._OK.getMessage(), HttpStatus.OK);
-    }
 
     // For failure responses
     public static Bang9Response<Void> onFailure(String code, String message, HttpStatus httpStatus) {

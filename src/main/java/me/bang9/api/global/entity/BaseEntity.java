@@ -33,7 +33,7 @@ public abstract class BaseEntity {
 
     public void softDelete() {
         if (status == false)
-            throw new Bang9Exception(CommonErrorStatus._BAD_REQUEST);
+            throw new Bang9Exception(CommonErrorStatus.ALREADY_DELETED);
         this.status = Boolean.FALSE;
     }
 

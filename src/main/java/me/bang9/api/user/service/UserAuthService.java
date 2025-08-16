@@ -2,6 +2,7 @@ package me.bang9.api.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.bang9.api.auth.dto.UserInfoResponse;
 import me.bang9.api.global.api.exception.Bang9Exception;
 import me.bang9.api.user.dto.req.UserCreateRequest;
 import me.bang9.api.user.dto.req.UserUpdateRequest;
@@ -9,6 +10,8 @@ import me.bang9.api.user.dto.res.UserResponse;
 import me.bang9.api.user.entity.UserEntity;
 import me.bang9.api.user.model.UserRole;
 import me.bang9.api.user.repository.UserJpaRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static me.bang9.api.global.api.code.status.UserErrorStatus.DUPLICATE_EMAIL;
+import static me.bang9.api.global.api.code.status.UserErrorStatus.USER_ACCOUNT_DISABLED;
 import static me.bang9.api.global.api.code.status.UserErrorStatus.USER_NOT_FOUND;
 
 @Slf4j
@@ -50,7 +54,7 @@ public class UserAuthService implements UserAuthUseCase {
         UserEntity savedUser = userRepository.save(user);
         log.info("User created successfully with ID: {}", savedUser.getId());
 
-        return UserResponse.of(savedUser);
+        return UserResponse.from(savedUser);
     }
 
     @Override
@@ -63,7 +67,7 @@ public class UserAuthService implements UserAuthUseCase {
         // 활성 사용자만 필터링 (소프트 삭제된 사용자 제외)
         List<UserResponse> activeUsers = users.stream()
                 .filter(user -> user.getStatus() == Boolean.TRUE)
-                .map(UserResponse::of)
+                .map(UserResponse::from)
                 .toList();
 
         log.info("Found {} active users", activeUsers.size());
@@ -88,7 +92,41 @@ public class UserAuthService implements UserAuthUseCase {
         }
 
         log.info("User found: {}", user.getEmail());
-        return UserResponse.of(user);
+        return UserResponse.from(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserInfoResponse getUserInfo() {
+        log.debug("User info request");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            log.warn("Unauthorized access to user info");
+//            throw new Bang9Exception(UNAUTHORIZED_ACCESS);
+//        }
+
+        String username = authentication.getName();
+
+        // Find user entity
+        UserEntity user = userRepository.findByEmail(username)
+                .orElseThrow(() -> {
+                    log.warn("User not found for user info: {}", username);
+                    return new Bang9Exception(USER_NOT_FOUND);
+                });
+
+        // Check if user account is active
+        if (!user.getStatus()) {
+            log.warn("User info request for disabled user: {}", username);
+            throw new Bang9Exception(USER_ACCOUNT_DISABLED);
+        }
+
+        // Create user info response
+        UserInfoResponse userInfo = UserInfoResponse.from(user);
+
+        log.debug("User info retrieved for: {}", username);
+        return userInfo;
     }
 
     @Override
@@ -114,7 +152,7 @@ public class UserAuthService implements UserAuthUseCase {
         UserEntity updatedUser = userRepository.save(user);
         log.info("User updated successfully: {}", updatedUser.getId());
 
-        return UserResponse.of(updatedUser);
+        return UserResponse.from(updatedUser);
     }
 
     @Override
@@ -128,15 +166,9 @@ public class UserAuthService implements UserAuthUseCase {
                     return new Bang9Exception(USER_NOT_FOUND);
                 });
 
-        try {
-            // UserEntity의 performSoftDelete() 메서드 호출
-            // 이미 삭제된 경우 Error를 던짐
-            user.softDelete();
-            userRepository.save(user);
-            log.info("User soft deleted successfully: {}", userId);
-        } catch (Error e) {
-            log.warn("Attempt to delete already deleted user with ID: {}", userId);
-            throw new Bang9Exception(USER_NOT_FOUND);
-        }
+        user.softDelete();
+        userRepository.save(user);
+        log.info("User soft deleted successfully: {}", userId);
+
     }
 }
