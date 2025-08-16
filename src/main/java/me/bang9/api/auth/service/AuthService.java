@@ -20,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,40 +130,39 @@ public class AuthService implements AuthUseCase {
         try {
             String refreshToken = request.refreshToken();
 
+            // Validate refresh token (check expiration)
+            if (jwtService.isTokenExpired(refreshToken)) {
+                throw new Bang9Exception(REFRESH_TOKEN_EXPIRED);
+            }
+
             // Extract username from refresh token
             String username = jwtService.extractUsername(refreshToken);
 
             // Find user and validate
-            UserEntity user = userRepository.findByEmail(username)
+            UserEntity authenticatedUser = userRepository.findByEmail(username)
                     .orElseThrow(() -> {
                         log.warn("User not found during token refresh: {}", username);
                         return new Bang9Exception(USER_NOT_FOUND);
                     });
 
             // Check if user account is active
-            if (!user.getStatus()) {
+            if (!authenticatedUser.getStatus()) {
                 log.warn("Token refresh attempt for disabled user: {}", username);
                 throw new Bang9Exception(USER_ACCOUNT_DISABLED);
             }
 
-            // Validate refresh token (check expiration)
-            if (jwtService.isTokenExpired(refreshToken)) {
-                log.warn("Refresh token expired for user: {}", username);
-                throw new Bang9Exception(REFRESH_TOKEN_EXPIRED);
-            }
-
             // Generate new tokens
-            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                    .username(user.getEmail())
-                    .password(user.getPassword())
-                    .authorities(user.getRole().getValue())
+            UserDetails userDetails = User.builder()
+                    .username(authenticatedUser.getEmail())
+                    .password(authenticatedUser.getPassword())
+                    .authorities(authenticatedUser.getRole().getValue())
                     .build();
 
             String newAccessToken = jwtService.generateAccessToken(userDetails);
             String newRefreshToken = jwtService.generateRefreshToken(username);
 
             // Create user info response
-            UserInfoResponse userInfo = UserInfoResponse.from(user);
+            UserInfoResponse userInfo = UserInfoResponse.from(authenticatedUser);
 
             // Create auth response
             AuthResponse authResponse = AuthResponse.of(
