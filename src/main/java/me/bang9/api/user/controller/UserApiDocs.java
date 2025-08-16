@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import me.bang9.api.auth.dto.UserInfoResponse;
 import me.bang9.api.global.api.Bang9Response;
-import me.bang9.api.user.dto.req.UserCreateRequest;
 import me.bang9.api.user.dto.req.UserUpdateRequest;
 import me.bang9.api.user.dto.res.UserResponse;
 import org.springframework.http.ResponseEntity;
@@ -18,52 +18,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserApiDocs {
-    @Operation(
-            summary = "이메일로 유저 생성",
-            description = "이메일 정보로 회원가입 성공 후 유저 정보 생성합니다.",
-            requestBody = @RequestBody(
-                    description = "생성 정보",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = UserCreateRequest.class),
-                            examples = @ExampleObject(
-                                    name = "User Creation Example",
-                                    summary = "Example user creation request",
-                                    value = """
-                                            {
-                                              "email": "user@example.com",
-                                              "password": "password123!",
-                                              "nickname": "Poby",
-                                              "name": "Sangmin Kim"
-                                            }
-                                            """
-                            )
-                    )
-            )
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "유저 생성 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Bang9Response.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "입력 정보가 유효하지 않음",
-                    content = @Content(mediaType = "application/json")
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Email already exists",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
-    ResponseEntity<Bang9Response<UserResponse>> createUser(UserCreateRequest request);
-
     @Operation(
             summary = "모든 유저 정보 조회",
             description = "모든 유저 정보를 조회합니다."
@@ -104,6 +58,17 @@ public interface UserApiDocs {
                     description = "유저id (UUID)",
                     required = true, example = "123e4567-e89b-12d3-a456-426614174000"
             ) UUID userId);
+
+    @Operation(
+            summary = "현재 사용자 정보 조회",
+            description = "현재 인증된 사용자의 정보를 조회합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공",
+                    content = @Content(schema = @Schema(implementation = UserInfoResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+    })
+    ResponseEntity<Bang9Response<UserInfoResponse>> getUserInfo();
 
     @Operation(
             summary = "유저 정보 수정",

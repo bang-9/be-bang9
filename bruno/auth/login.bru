@@ -1,0 +1,27 @@
+meta {
+  name: login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL}}/v1/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "test2@bang9.me",
+    "password": "testpassword2@"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("accessToken",res.getBody().result.accessToken);
+  bru.setEnvVar("refreshToken",res.getBody().result.refreshToken);
+}
+
+settings {
+  encodeUrl: true
+}

@@ -24,6 +24,7 @@ public enum CommonErrorStatus implements BaseErrorCode {
     _INTERNAL_SERVER_ERROR(INTERNAL_SERVER_ERROR, "COMMON-500", "Internal Server Error"),
     _SERVICE_UNAVAILABLE(SERVICE_UNAVAILABLE, "COMMON-503", "Service Unavailable"),
 
+    ALREADY_DELETED(BAD_REQUEST, "COMMON-400", "Already deleted"),
     VALIDATION_ERROR(BAD_REQUEST, "VALIDATION-400", "Validation error");
 
     private final HttpStatus httpStatus;

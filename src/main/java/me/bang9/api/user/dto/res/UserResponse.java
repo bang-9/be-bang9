@@ -15,7 +15,7 @@ public record UserResponse(
         String provider,
         Set<String> agency
 ) {
-    public static UserResponse of(UserEntity user) {
+    public static UserResponse from(UserEntity user) {
         return new UserResponse(
                 user.getId(),
                 user.getEmail(),

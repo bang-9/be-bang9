@@ -1,0 +1,19 @@
+meta {
+  name: getUserInfo
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{BASE_URL}}/v1/users/info
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+settings {
+  encodeUrl: true
+}

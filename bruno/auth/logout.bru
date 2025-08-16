@@ -1,0 +1,21 @@
+meta {
+  name: logout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BASE_URL}}/v1/auth/logout
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "accessToken": "{{accessToken}}"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

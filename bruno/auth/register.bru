@@ -1,0 +1,24 @@
+meta {
+  name: register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/v1/auth/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "test2@bang9.me",
+    "password": "testpassword2@",
+    "nickname": "test1",
+    "provider": "EMAIL"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,21 @@
+meta {
+  name: updateUser
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{BASE_URL}}/v1/users/a8b0c652-0942-49c7-b6fd-ffcd11b1245b
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nickname": "test1_edited"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
